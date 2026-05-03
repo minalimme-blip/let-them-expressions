@@ -6,7 +6,7 @@ Mel Robbins 의 *The Let Them Theory* (2024) 에서 한국 직장인이 일상�
 
 ## 🌐 라이브 페이지
 
-→ https://minalim.github.io/let-them-expressions/
+→ https://minalimme-blip.github.io/let-them-expressions/
 
 ## 📚 다루는 표현
 
