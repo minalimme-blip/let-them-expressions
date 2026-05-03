@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>백쪽이 — Let Them Theory 표현 deep-dive 학습 페이지</title>
+<style>
+  @font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansTTFBold.woff') format('woff');
+    font-weight: 700; font-display: swap;
+  }
+  @font-face {
+    font-family: 'GmarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansTTFMedium.woff') format('woff');
+    font-weight: 500; font-display: swap;
+  }
+  @font-face {
+    font-family: 'GangwonEduPower';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-1@1.1/GangwonEduPowerExtraBoldA.woff2') format('woff2');
+    font-weight: 800; font-display: swap;
+  }
+
+  :root {
+    --bg-yellow: #F5DC73;
+    --bg-cream: #FFF8E1;
+    --text-dark: #1A1A1A;
+    --accent-red: #E63946;
+    --pill-black: #000000;
+    --card-white: #FFFFFF;
+    --font-display: 'GangwonEduPower', 'GmarketSans', sans-serif;
+    --font-body: 'GmarketSans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-cream);
+    font-family: var(--font-body);
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+
+  /* HEADER */
+  .page-hero {
+    background: var(--bg-yellow);
+    border: 3px solid var(--text-dark);
+    border-radius: 24px;
+    padding: 50px 50px 56px;
+    position: relative;
+    margin-bottom: 56px;
+  }
+  .page-hero .label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .page-hero h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 64px;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: var(--text-dark);
+  }
+  .page-hero h1 .red {
+    color: var(--accent-red);
+    position: relative;
+    display: inline-block;
+  }
+  .page-hero h1 .red::after {
+    content: "";
+    position: absolute;
+    left: -2px; right: -2px; bottom: -3px;
+    height: 8px;
+    background: var(--accent-red);
+    transform: skewX(-3deg);
+    border-radius: 3px;
+    opacity: 0.3;
+  }
+  .page-hero .sub {
+    margin-top: 24px;
+    font-size: 19px;
+    line-height: 1.65;
+    color: var(--text-dark);
+    opacity: 0.85;
+  }
+  .page-hero .row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 32px;
+  }
+  .page-hero .book-cover-img {
+    width: 110px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 4px 5px 0 rgba(0,0,0,0.18);
+    transform: rotate(-3deg);
+  }
+  .page-hero .book-meta {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .page-hero .book-meta strong { font-weight: 700; }
+  .page-hero .book-meta .pill {
+    display: inline-block;
+    background: var(--accent-red);
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--card-white);
+    border: 2px solid var(--text-dark);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-bottom: 60px;
+  }
+  .toc h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 28px;
+    margin-bottom: 14px;
+    color: var(--text-dark);
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: tocnum;
+  }
+  .toc ol li {
+    counter-increment: tocnum;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ddd;
+    font-size: 18px;
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .toc ol li:last-child { border-bottom: none; }
+  .toc ol li::before {
+    content: counter(tocnum, decimal-leading-zero);
+    font-family: 'Cormorant Garamond', 'GmarketSans', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent-red);
+    font-size: 22px;
+    min-width: 32px;
+  }
+  .toc ol li a {
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 500;
+    flex: 1;
+  }
+  .toc ol li a strong {
+    color: var(--accent-red);
+    font-weight: 700;
+  }
+  .toc ol li .ch-tag {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  /* EXPRESSION SECTION */
+  .expression {
+    background: var(--card-white);
+    border: 3px solid var(--text-dark);
+    border-radius: 22px;
+    padding: 44px 48px 48px;
+    margin-bottom: 48px;
+    scroll-margin-top: 24px;
+  }
+  .expression .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .expression .num {
+    font-family: 'Cormorant Garamond', 'GmarketSans', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 36px;
+    color: var(--accent-red);
+    line-height: 1;
+  }
+  .expression .ch-label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #888;
+  }
+  .expression h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 64px;
+    line-height: 1.0;
+    letter-spacing: -1.5px;
+    color: var(--accent-red);
+    margin-bottom: 16px;
+  }
+  .expression h2.smaller { font-size: 54px; }
+  .expression .meaning {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.5;
+    color: var(--text-dark);
+    padding-left: 16px;
+    border-left: 4px solid var(--accent-red);
+    margin: 24px 0 32px;
+  }
+  .expression .examples {
+    background: var(--bg-cream);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .expression .examples h3 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 14px;
+  }
+  .expression .examples .ex {
+    margin-bottom: 18px;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .expression .examples .ex:last-child { margin-bottom: 0; }
+  .expression .examples .ex em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+  .expression .examples .ex em strong {
+    font-style: normal;
+    color: var(--accent-red);
+    font-weight: 700;
+  }
+  .expression .examples .ex .ko {
+    color: #555;
+    font-size: 15px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Insight box */
+  .insight {
+    background: linear-gradient(135deg, var(--bg-yellow) 0%, #FFE99E 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .insight strong { color: var(--accent-red); font-weight: 700; }
+
+  /* Video embed wrapper */
+  .video-block {
+    margin-top: 28px;
+  }
+  .video-block h3 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .video-wrap {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+    border: 2px solid var(--text-dark);
+  }
+  .video-wrap iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+  }
+  .video-fallback {
+    background: var(--bg-cream);
+    border: 2px dashed #aaa;
+    border-radius: 12px;
+    padding: 24px 28px;
+    color: #555;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .video-fallback strong { color: var(--accent-red); }
+  .video-fallback a {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--text-dark);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+  .video-fallback a:hover { background: var(--accent-red); }
+
+  /* CTA */
+  .cta-block {
+    background: var(--bg-yellow);
+    border: 3px solid var(--text-dark);
+    border-radius: 22px;
+    padding: 50px 48px;
+    text-align: center;
+    margin-top: 56px;
+  }
+  .cta-block h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 48px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+  .cta-block h2 .red { color: var(--accent-red); }
+  .cta-block p {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin-bottom: 24px;
+  }
+  .cta-block .pill-link {
+    display: inline-block;
+    background: var(--text-dark);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+  }
+
+  /* Footer page */
+  .page-footer {
+    margin-top: 60px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+  }
+  .page-footer a { color: var(--accent-red); text-decoration: none; }
+
+  /* Mascot accent */
+  .bb-giraf-floating {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 96px;
+    height: 96px;
+    background-image: url('brand-refs/mascot/giraf.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.92;
+  }
+
+  @media (max-width: 720px) {
+    .container { padding: 30px 20px 60px; }
+    .page-hero { padding: 32px 28px; }
+    .page-hero h1 { font-size: 44px; }
+    .expression { padding: 28px 24px; }
+    .expression h2 { font-size: 44px; }
+    .expression h2.smaller { font-size: 38px; }
+    .bb-giraf-floating { width: 64px; height: 64px; bottom: 12px; right: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="label">Let Them Theory · 표현 deep-dive</div>
+    <h1>
+      책 한 권에서<br>
+      평생 쓸 영어 표현 <span class="red">5개</span>.
+    </h1>
+    <div class="sub">
+      Mel Robbins 의 The Let Them Theory 에서 한국 직장인이 일상에서 바로 쓸 수 있는 표현 5개를 골랐어요.<br>
+      각 표현에 책 인용·native 예문·관련 영상까지 — 깊게 한 번 익히고 평생 활용하세요 ☕
+    </div>
+    <div class="row">
+      <img src="brand-refs/let-them-theory/book-cover.jpg" alt="The Let Them Theory" class="book-cover-img">
+      <div class="book-meta">
+        <strong>The Let Them Theory</strong><br>
+        Mel Robbins · 270 pp · 2024<br>
+        <span class="pill">백쪽이 컴백 시즌 5/8 모집 시작</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>📚 목차</h2>
+    <ol>
+      <li><a href="#exp-1"><strong>bend over backward</strong> — 무리해서 애쓰다</a> <span class="ch-tag">Ch.1</span></li>
+      <li><a href="#exp-2"><strong>Been there.</strong> — 나도 겪어봤어</a> <span class="ch-tag">Ch.2</span></li>
+      <li><a href="#exp-3"><strong>walk the talk</strong> — 말한 대로 행동하다</a> <span class="ch-tag">Ch.15</span></li>
+      <li><a href="#exp-4"><strong>demoralized</strong> — 사기 꺾인</a> <span class="ch-tag">Ch.19</span></li>
+      <li><a href="#exp-5"><strong>something feels off</strong> — 뭔가 이상해</a> <span class="ch-tag">Ch.20</span></li>
+    </ol>
+  </div>
+
+  <!-- EXPRESSION 1 -->
+  <article class="expression" id="exp-1">
+    <div class="top-row">
+      <div class="num">01</div>
+      <div class="ch-label">From Chapter 1 · 직장·관계</div>
+    </div>
+    <h2>bend over backward</h2>
+    <div class="meaning">등이 뒤로 꺾일 정도로 누군가를 위해 애쓰다 / 무리하게 노력하다</div>
+
+    <div class="examples">
+      <h3>📌 native 예문</h3>
+      <div class="ex">
+        <em>"She <strong>bent over backwards</strong> to help me when I moved into my new apartment."</em>
+        <span class="ko">→ 새 집 이사할 때 그녀가 정말 열심히 도와줬어.</span>
+      </div>
+      <div class="ex">
+        <em>"I <strong>bent over backwards</strong> for him, and he didn't even say thank you."</em>
+        <span class="ko">→ 그 사람을 위해 온갖 수고를 다 했는데, 고맙다는 말도 안 하더라.</span>
+      </div>
+      <div class="ex">
+        <em>"We <strong>bent over backwards</strong> to meet the deadline."</em>
+        <span class="ko">→ 마감 맞추려고 정말 무리했어요.</span>
+      </div>
+    </div>
+
+    <div class="insight">
+      💡 <strong>어원</strong> : 체조의 backbend (등 뒤로 젖히기) 동작에서 유래. 920 CE 부터 사용된 오래된 표현. 누군가를 위해 *체조 동작 같은 무리한 노력*을 한다는 비유.
+    </div>
+
+    <div class="video-block">
+      <h3>📺 관련 영상 — Voice of America "English in a Minute"</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/Z1eXQmH9ojw" title="Bend Over Backwards - English in a Minute" allowfullscreen></iframe>
+      </div>
+      <div style="margin-top: 10px; font-size: 14px; color: #888;">
+        1분짜리 짧은 학습 영상. 추가 reference :
+        <a href="https://dictionary.cambridge.org/dictionary/english/bend-over-backwards" target="_blank" rel="noopener" style="color: var(--accent-red);">Cambridge 사전 →</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- EXPRESSION 2 -->
+  <article class="expression" id="exp-2">
+    <div class="top-row">
+      <div class="num">02</div>
+      <div class="ch-label">From Chapter 2 · 회화·공감</div>
+    </div>
+    <h2>Been there.</h2>
+    <div class="meaning">나도 겪어봤어 / 어떤 느낌인지 알아 (한국어 "맞장구"의 영어 짝꿍)</div>
+
+    <div class="examples">
+      <h3>📌 native 회화 패턴</h3>
+      <div class="ex">
+        <em>A: "I keep studying math, but I don't understand."</em><br>
+        <em>B: <strong>"Been there."</strong></em>
+        <span class="ko">→ A: 수학 계속 공부해도 모르겠어. / B: 나도 그랬어.</span>
+      </div>
+      <div class="ex">
+        <em>A: "Those sales meetings really wear me out!"</em><br>
+        <em>B: <strong>"I've been there."</strong></em>
+        <span class="ko">→ A: 그 영업 회의 진짜 진 빠지더라! / B: 나도 그 마음 알아.</span>
+      </div>
+      <div class="ex">
+        <em>A: "She ghosted me after 3 dates."</em><br>
+        <em>B: <strong>"Oh man… been there."</strong></em>
+        <span class="ko">→ A: 데이트 세 번 만나고 잠수타더라. / B: 아... 나도 겪어봤어.</span>
+      </div>
+    </div>
+
+    <div class="insight">
+      💡 <strong>주어 생략 OK</strong> : 짧게 "Been there." 만 써도 자연스러움. 정식 표현은 "I've been there." 인데 회화에서 주어 생략하는 게 미국식. <br>
+      🆔 <strong>"Been there, done that."</strong> = 약간 시들한 톤으로 "그거 다 해봤어" (1970년대 popularized)
+    </div>
+
+    <div class="video-block">
+      <h3>📺 관련 영상</h3>
+      <div class="video-fallback">
+        <strong>YouTube 검색 keyword</strong> : <em>"been there done that meaning conversation"</em>
+        <a href="https://www.youtube.com/results?search_query=been+there+done+that+meaning+conversation" target="_blank" rel="noopener">YouTube 검색 →</a>
+        <a href="https://idioms.thefreedictionary.com/been+there" target="_blank" rel="noopener">The Free Dictionary →</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- EXPRESSION 3 -->
+  <article class="expression" id="exp-3">
+    <div class="top-row">
+      <div class="num">03</div>
+      <div class="ch-label">From Chapter 15 · 직장·리더십</div>
+    </div>
+    <h2>walk the talk</h2>
+    <div class="meaning">말한 대로 행동하다 / 말과 행동이 일치하다 (반대말 : "He's all talk")</div>
+
+    <div class="examples">
+      <h3>📌 native 예문</h3>
+      <div class="ex">
+        <em>"If you want to be a leader, you need to <strong>walk the talk</strong>."</em>
+        <span class="ko">→ 리더가 되고 싶다면, 말한 대로 행동해야 해.</span>
+      </div>
+      <div class="ex">
+        <em>"He <strong>talks the talk</strong> but doesn't walk the walk."</em>
+        <span class="ko">→ 말은 번지르르한데 실천은 안 해.</span>
+      </div>
+      <div class="ex">
+        <em>"The team leader emphasizes punctuality but is frequently late — fails to <strong>walk the talk</strong>."</em>
+        <span class="ko">→ 팀장이 시간 엄수를 강조하면서 자기는 자주 늦어. 말과 행동이 안 맞아.</span>
+      </div>
+    </div>
+
+    <div class="insight">
+      💡 <strong>축약형</strong> : 풀 표현은 "If you talk the talk, you have to walk the walk" 의 미국식 줄임말. <br>
+      🤝 <strong>유사 표현</strong> : "actions speak louder than words" / "practice what you preach"
+    </div>
+
+    <div class="video-block">
+      <h3>📺 관련 영상 — Shaw English Online</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/j4rKx8H1DlU" title="Talk the Talk, Walk the Walk - Shaw English" allowfullscreen></iframe>
+      </div>
+      <div style="margin-top: 10px; font-size: 14px; color: #888;">
+        TALK THE TALK · WALK THE WALK · ALL WALKS OF LIFE 세 표현 모두 한 영상에. 추가 :
+        <a href="https://dictionary.cambridge.org/dictionary/english/talk-the-talk-walk-the-walk" target="_blank" rel="noopener" style="color: var(--accent-red);">Cambridge 사전 →</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- EXPRESSION 4 -->
+  <article class="expression" id="exp-4">
+    <div class="top-row">
+      <div class="num">04</div>
+      <div class="ch-label">From Chapter 19 · 감정 어휘</div>
+    </div>
+    <h2 class="smaller">demoralized</h2>
+    <div class="meaning">의욕 잃은 / 사기가 꺾인 — "아, 나 안 될 것 같아…" 한 그 상태</div>
+
+    <div class="examples">
+      <h3>📌 native 예문</h3>
+      <div class="ex">
+        <em>"I felt completely <strong>demoralized</strong> after the rejection."</em>
+        <span class="ko">→ 거절당하고 나서 완전히 기운이 빠졌어.</span>
+      </div>
+      <div class="ex">
+        <em>"Employees are feeling <strong>demoralized</strong> due to the recent layoffs."</em>
+        <span class="ko">→ 최근 해고 여파로 직원들 사기가 꺾였어요.</span>
+      </div>
+      <div class="ex">
+        <em>"The team had suffered two <strong>demoralizing</strong> losses."</em>
+        <span class="ko">→ 그 팀은 사기 꺾이는 패배를 두 번 당했다.</span>
+      </div>
+    </div>
+
+    <div class="insight">
+      💡 <strong>어원 풀이</strong> : <strong>moral</strong> = 도덕? 아니에요! <strong>moral</strong> 에는 "사기·의욕" 의미도 있어요 (cf. <em>moral support</em> = 정신적 지지). <br>
+      <strong>de-</strong>(반대) + <strong>moral</strong>(의욕) = <strong>demoralize</strong>(의욕 꺾다) → <strong>demoralized</strong>(꺾인 상태)
+    </div>
+
+    <div class="insight" style="background: linear-gradient(135deg, #FFE5D9, #FFD2C2);">
+      🆚 <strong>비슷한 단어 차이</strong><br>
+      • <strong>demoralized</strong> — 무기력, 좌절 (내부에서 무너진 느낌)<br>
+      • <strong>discouraged</strong> — 용기/동기 저하 (외부 요인으로)<br>
+      • <strong>defeated</strong> — 진 사람처럼 느껴짐 (상황에 진 느낌)
+    </div>
+
+    <div class="video-block">
+      <h3>📺 관련 영상 — Understanding "Be Demoralized" Deep Dive</h3>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/tzcRcM9Jnlc" title="Be Demoralized - Deep Dive into English Phrases" allowfullscreen></iframe>
+      </div>
+      <div style="margin-top: 10px; font-size: 14px; color: #888;">
+        의미·어원·사용 예 종합 영상. 추가 :
+        <a href="https://www.merriam-webster.com/dictionary/demoralize" target="_blank" rel="noopener" style="color: var(--accent-red);">Merriam-Webster →</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- EXPRESSION 5 -->
+  <article class="expression" id="exp-5">
+    <div class="top-row">
+      <div class="num">05</div>
+      <div class="ch-label">From Chapter 20 · 직감·관계</div>
+    </div>
+    <h2 class="smaller">something feels off</h2>
+    <div class="meaning">뭔가 이상해 / 촉이 이상해 — 딱 짚어 말은 못하겠지만 직감적으로 unease 한 상태</div>
+
+    <div class="examples">
+      <h3>📌 native 예문</h3>
+      <div class="ex">
+        <em>"I don't know… <strong>something feels off</strong> about this guy."</em>
+        <span class="ko">→ 뭔가 이 사람 이상해. (이유는 정확히 모르겠지만)</span>
+      </div>
+      <div class="ex">
+        <em>"This room <strong>feels off</strong> today—like the energy is weird."</em>
+        <span class="ko">→ 오늘 이 방 분위기 좀 이상해. 기운이 묘해.</span>
+      </div>
+      <div class="ex">
+        <em>"The milk smells fine, but <strong>something still feels off</strong>."</em>
+        <span class="ko">→ 우유 냄새는 괜찮은데, 왠지 찜찜해.</span>
+      </div>
+    </div>
+
+    <div class="insight">
+      💡 <strong>"is" vs "feels"</strong> : <em>"something is off"</em> = 객관적으로 문제가 있다 (예: 기계 고장). <em>"something feels off"</em> = 주관적·직감적으로 이상하다.
+    </div>
+
+    <div class="insight" style="background: linear-gradient(135deg, #E5F0FF, #D2E5FF);">
+      🆔 <strong>짝꿍 표현</strong><br>
+      • <strong>"can't put my finger on it"</strong> — 딱 짚어 말은 못하겠지만 (<em>I can't put my finger on it, but something's off.</em>)<br>
+      • <strong>"this doesn't sit right with me"</strong> — 마음에 걸린다·찜찜하다<br>
+      • <strong>"something's not quite right"</strong> — 뭔가 약간 어긋난 느낌
+    </div>
+
+    <div class="video-block">
+      <h3>📺 관련 영상</h3>
+      <div class="video-fallback">
+        <strong>YouTube 검색 keyword</strong> : <em>"something feels off meaning"</em>
+        <a href="https://www.youtube.com/results?search_query=something+feels+off+meaning+English" target="_blank" rel="noopener">YouTube 검색 →</a>
+        <a href="https://ludwig.guru/s/something+feels+off" target="_blank" rel="noopener">Ludwig.guru 사용 예 →</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <h2>5개 표현 익히셨다면<br><span class="red">30개</span> 더 같이 가요.</h2>
+    <p>
+      Let Them Theory 5주 같이 읽기 — Standard ₩69,900 / Plus ₩99,000<br>
+      2026.06.04 → 07.02 · 정원 18명 한정
+    </p>
+    <a href="https://100preadingproject.imweb.me/" class="pill-link" target="_blank" rel="noopener">5/8 (목) 모집 시작 →</a>
+  </div>
+
+  <div class="page-footer">
+    백쪽이 — 영어 원서 북클럽 · <a href="https://www.instagram.com/100p_reading_project/" target="_blank" rel="noopener">@100p_reading_project</a><br>
+    <em>이 페이지는 학습용 reference 입니다. 모든 인용은 The Let Them Theory by Mel Robbins (2024).</em>
+  </div>
+
+</div>
+
+<div class="bb-giraf-floating" title="백쪽이 마스코트 giraf 🦒"></div>
+
+</body>
+</html>
