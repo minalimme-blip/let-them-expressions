@@ -393,13 +393,40 @@
   }
 
   @media (max-width: 720px) {
-    .container { padding: 30px 20px 60px; }
-    .page-hero { padding: 32px 28px; }
-    .page-hero h1 { font-size: 44px; }
-    .expression { padding: 28px 24px; }
-    .expression h2 { font-size: 44px; }
-    .expression h2.smaller { font-size: 38px; }
+    .container { padding: 28px 18px 60px; }
+    .page-hero { padding: 28px 24px; }
+    .page-hero h1 { font-size: 34px; line-height: 1.15; }
+    .page-hero .sub { font-size: 16px; line-height: 1.6; margin-top: 18px; }
+    .page-hero .label { font-size: 12px; }
+    .toc { padding: 22px 24px; }
+    .toc h2 { font-size: 24px; }
+    .toc ol li { font-size: 15px; gap: 10px; padding: 8px 0; }
+    .toc ol li::before { font-size: 18px; min-width: 26px; }
+    .expression { padding: 24px 22px; margin-bottom: 32px; }
+    .expression h2 { font-size: 34px; }
+    .expression h2.smaller { font-size: 28px; }
+    .expression .top-row { margin-bottom: 8px; }
+    .expression .num { font-size: 28px; }
+    .expression .ch-label { font-size: 11px; letter-spacing: 1.5px; }
+    .expression .meaning { font-size: 18px; padding-left: 12px; margin: 18px 0 22px; }
+    .expression .examples { padding: 18px 20px; }
+    .expression .examples .ex { font-size: 15px; margin-bottom: 14px; }
+    .expression .examples .ex .ko { font-size: 13px; }
+    .insight { padding: 16px 18px; font-size: 14px; }
+    .video-block h3 { font-size: 12px; }
+    .video-fallback { padding: 18px 20px; font-size: 13px; }
+    .cta-block { padding: 36px 24px; margin-top: 40px; }
+    .cta-block h2 { font-size: 32px; line-height: 1.2; }
+    .cta-block p { font-size: 15px; }
+    .cta-block .pill-link { font-size: 18px; padding: 12px 24px; }
     .bb-giraf-floating { width: 64px; height: 64px; bottom: 12px; right: 12px; }
+  }
+
+  @media (max-width: 420px) {
+    .page-hero h1 { font-size: 28px; }
+    .expression h2 { font-size: 28px; }
+    .expression h2.smaller { font-size: 24px; }
+    .cta-block h2 { font-size: 26px; }
   }
 </style>
 </head>
